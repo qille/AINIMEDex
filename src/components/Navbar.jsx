@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { toast } from 'react-toastify';
-import { debounce } from 'lodash';
 import 'react-toastify/dist/ReactToastify.css';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { FaWallet, FaFaucet } from 'react-icons/fa';
@@ -10,7 +9,7 @@ import { IoSunny, IoMoon } from 'react-icons/io5';
 import AINIMELogo from '../assets/evm-tokens/ainime-logo.gif';
 import '../style/Navbar.css';
 
-// Konfigurasi jaringan
+// --- Konfigurasi Jaringan ---
 const galileoTestnet = {
   chainId: '0x40D9',
   chainName: '0G Galileo Testnet',
@@ -26,9 +25,8 @@ function Navbar({ onWalletDataChange, theme, toggleTheme }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isMetaMaskAvailable, setIsMetaMaskAvailable] = useState(false);
-  const navigate = useNavigate();
 
-  // Memeriksa status disconect dari localStorage saat inisialisasi
+  // Mengambil status disconect dari localStorage saat inisialisasi
   const [isDisconnected, setIsDisconnected] = useState(
     localStorage.getItem('isDisconnected') === 'true'
   );
@@ -40,30 +38,26 @@ function Navbar({ onWalletDataChange, theme, toggleTheme }) {
     setIsDisconnected(true);
     localStorage.setItem('isDisconnected', 'true');
     toast.info('Wallet disconnected.', { position: 'bottom-left' });
-    
-    // Muat ulang browser setelah putus koneksi
-    window.location.reload(); 
   }, [onWalletDataChange]);
 
   // --- Fungsi untuk menyambungkan wallet ---
   const connectWallet = useCallback(async () => {
-    if (isConnecting) return; // Mencegah klik ganda
+    if (isConnecting) return;
     setIsConnecting(true);
 
     try {
-      const provider = await detectEthereumProvider({ timeout: 2000 });
+      const provider = await detectEthereumProvider({ timeout: 3000 });
       if (!provider) {
         setIsMetaMaskAvailable(false);
-        toast.error('MetaMask not available. Please install MetaMask.', {
-          position: 'bottom-left',
-        });
+        toast.error('MetaMask not available. Please install MetaMask.', { position: 'bottom-left' });
         return;
       }
       setIsMetaMaskAvailable(true);
 
+      // Permintaan akun hanya jika belum terhubung
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       const address = ethers.utils.getAddress(accounts[0]);
-
+      
       const currentChainId = await provider.request({ method: 'eth_chainId' });
       if (currentChainId.toLowerCase() !== galileoTestnet.chainId.toLowerCase()) {
         try {
@@ -79,21 +73,19 @@ function Navbar({ onWalletDataChange, theme, toggleTheme }) {
             });
             toast.success('Galileo Testnet has been added!', { position: 'bottom-left' });
           } else {
-            toast.error('Please switch to Galileo Testnet manually.', {
-              position: 'bottom-left',
-            });
-            throw switchError; // Lemparkan error untuk ditangkap di blok catch utama
+            toast.error('Please switch to Galileo Testnet manually.', { position: 'bottom-left' });
+            return; // Hentikan proses jika gagal
           }
         }
       }
 
-      const finalChainId = await provider.request({ method: 'eth_chainId' });
-      const newWalletData = { address, chainId: finalChainId };
+      const newWalletData = {
+        address,
+        chainId: await provider.request({ method: 'eth_chainId' }),
+      };
       setWalletData(newWalletData);
       onWalletDataChange(newWalletData);
-      toast.success(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`, {
-        position: 'bottom-left',
-      });
+      toast.success(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`, { position: 'bottom-left' });
       setIsDisconnected(false);
       localStorage.setItem('isDisconnected', 'false');
 
@@ -101,101 +93,75 @@ function Navbar({ onWalletDataChange, theme, toggleTheme }) {
       console.error('Error connecting wallet:', error);
       toast.error('Failed to connect wallet.', { position: 'bottom-left' });
     } finally {
-      setIsConnecting(false); // Pastikan state ini selalu diatur kembali
+      setIsConnecting(false);
     }
   }, [isConnecting, onWalletDataChange]);
 
-  // --- Fungsi untuk memeriksa status koneksi saat dimuat atau berubah ---
-  const checkConnectionStatus = useCallback(async () => {
-    // Jika isDisconnected true, jangan lakukan pemeriksaan otomatis
-    if (isDisconnected) {
-      setIsMetaMaskAvailable(true); // Biarkan tombol tetap aktif
-      return;
-    }
-    
-    const provider = await detectEthereumProvider({ timeout: 2000 });
-    if (provider && provider.isMetaMask) {
-      setIsMetaMaskAvailable(true);
-      try {
-        const accounts = await provider.request({ method: 'eth_accounts' });
-        if (accounts.length > 0) {
-          const chainId = await provider.request({ method: 'eth_chainId' });
-          const newWalletData = {
-            address: ethers.utils.getAddress(accounts[0]),
-            chainId,
-          };
-          setWalletData(newWalletData);
-          onWalletDataChange(newWalletData);
-        } else {
-          // Jika tidak ada akun yang terhubung, putuskan koneksi
-          disconnectWallet();
-        }
-      } catch (error) {
-        console.error('Error checking MetaMask status:', error);
-        disconnectWallet();
+  // --- Efek untuk memeriksa status koneksi ---
+  useEffect(() => {
+    const checkConnectionStatus = async () => {
+      // Jangan periksa status jika pengguna secara eksplisit memutuskan koneksi
+      if (isDisconnected) {
+        setIsMetaMaskAvailable(true);
+        return;
       }
-    } else {
-      setIsMetaMaskAvailable(false);
-    }
-  }, [isDisconnected, onWalletDataChange, disconnectWallet]);
-
-  // --- Debounce untuk event listener ---
-  const debouncedHandleChainChanged = useMemo(
-    () =>
-      debounce((newChainId) => {
-        if (walletData.address) {
-          if (newChainId.toLowerCase() !== galileoTestnet.chainId.toLowerCase()) {
-            toast.error('Wrong network. Please switch to Galileo Testnet.', {
-              position: 'bottom-left',
-            });
-          }
-          const newWalletData = { ...walletData, chainId: newChainId };
-          setWalletData(newWalletData);
-          onWalletDataChange(newWalletData);
-        }
-      }, 300),
-    [walletData.address, onWalletDataChange]
-  );
-
-  const debouncedHandleAccountsChanged = useMemo(
-    () =>
-      debounce(async (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          const provider = await detectEthereumProvider({ timeout: 2000 });
-          if (provider) {
-            const newChainId = await provider.request({ method: 'eth_chainId' });
+      
+      const provider = await detectEthereumProvider({ timeout: 2000 });
+      if (provider && provider.isMetaMask) {
+        setIsMetaMaskAvailable(true);
+        try {
+          const accounts = await provider.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            const chainId = await provider.request({ method: 'eth_chainId' });
             const newWalletData = {
               address: ethers.utils.getAddress(accounts[0]),
-              chainId: newChainId,
+              chainId,
             };
             setWalletData(newWalletData);
             onWalletDataChange(newWalletData);
+          } else {
+            // Jika tidak ada akun yang terhubung, atur ulang state
+            setWalletData({ address: '', chainId: '' });
+            onWalletDataChange({ address: '', chainId: '' });
           }
+        } catch (error) {
+          console.error('Error checking MetaMask status:', error);
+          setWalletData({ address: '', chainId: '' });
+          onWalletDataChange({ address: '', chainId: '' });
         }
-      }, 300),
-    [disconnectWallet, onWalletDataChange]
-  );
-
-  // --- Efek samping: memeriksa koneksi dan menyiapkan listener ---
-  useEffect(() => {
+      } else {
+        setIsMetaMaskAvailable(false);
+        setWalletData({ address: '', chainId: '' });
+        onWalletDataChange({ address: '', chainId: '' });
+      }
+    };
+    
     checkConnectionStatus();
 
     if (window.ethereum) {
-      window.ethereum.on('accountsChanged', debouncedHandleAccountsChanged);
-      window.ethereum.on('chainChanged', debouncedHandleChainChanged);
-
-      return () => {
-        if (window.ethereum?.removeListener) {
-          window.ethereum.removeListener('accountsChanged', debouncedHandleAccountsChanged);
-          window.ethereum.removeListener('chainChanged', debouncedHandleChainChanged);
+      const handleAccountsChanged = (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          checkConnectionStatus();
         }
       };
-    }
-  }, [checkConnectionStatus, debouncedHandleAccountsChanged, debouncedHandleChainChanged]);
 
-  // --- Render Komponen ---
+      const handleChainChanged = () => {
+        checkConnectionStatus();
+      };
+      
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, [isDisconnected, onWalletDataChange, disconnectWallet]);
+
+  // --- Perbaikan Tampilan (JSX) ---
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -209,71 +175,50 @@ function Navbar({ onWalletDataChange, theme, toggleTheme }) {
         ☰
       </button>
       <div className={`menu-items ${isMenuOpen ? 'open' : ''}`}>
-        <NavLink
-          to="/"
-          className={({ isActive }) => `menu-btn nav-link ${isActive ? 'active' : ''}`}
-          onClick={() => setIsMenuOpen(false)}
-        >
+        <NavLink to="/" className={({ isActive }) => `menu-btn nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
           Swap
         </NavLink>
-        <NavLink
-          to="/liquidity"
-          className={({ isActive }) => `menu-btn nav-link ${isActive ? 'active' : ''}`}
-          onClick={() => setIsMenuOpen(false)}
-        >
+        <NavLink to="/liquidity" className={({ isActive }) => `menu-btn nav-link ${isActive ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
           Pools
         </NavLink>
-        <NavLink
-          to="/faucet"
-          className={({ isActive }) => `menu-btn faucet-btn ${isActive ? 'active' : ''}`}
-          onClick={() => setIsMenuOpen(false)}
-        >
+        <NavLink to="/faucet" className={({ isActive }) => `menu-btn faucet-btn ${isActive ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
           <FaFaucet /> Claim Faucet
         </NavLink>
-        {walletData.address ? (
-          <div className="wallet-info">
+        
+        <div className="wallet-container">
+          {walletData.address ? (
+            <>
+              <button
+                className="menu-btn wallet-btn connected"
+                onClick={() => {
+                  navigator.clipboard.writeText(walletData.address);
+                  toast.success('Wallet address copied!', { position: 'bottom-left' });
+                }}
+              >
+                <FaWallet />
+                <span className="wallet-address">
+                  {`${walletData.address.substring(0, 6)}...${walletData.address.substring(38)}`}
+                </span>
+              </button>
+              <button
+                className="menu-btn disconnect-btn"
+                onClick={disconnectWallet}
+              >
+                Disconnect
+              </button>
+            </>
+          ) : (
             <button
-              className="menu-btn wallet-btn connected"
-              onClick={() => {
-                navigator.clipboard.writeText(walletData.address);
-                toast.success('Wallet address copied!', { position: 'bottom-left' });
-                setIsMenuOpen(false);
-              }}
+              className="menu-btn wallet-btn"
+              onClick={connectWallet}
+              disabled={isConnecting || !isMetaMaskAvailable}
             >
-              <FaWallet />
-              <span className="wallet-address">
-                {`${walletData.address.substring(0, 6)}...${walletData.address.substring(38)}`}
-              </span>
+              <FaWallet /> {isConnecting ? 'Connecting...' : 'Connect Wallet'}
             </button>
-            <button
-              className="menu-btn disconnect-btn"
-              onClick={() => {
-                disconnectWallet();
-                setIsMenuOpen(false);
-              }}
-            >
-              Disconnect
-            </button>
-          </div>
-        ) : (
-          <button
-            className="menu-btn wallet-btn"
-            onClick={() => {
-              connectWallet();
-              setIsMenuOpen(false);
-            }}
-            disabled={isConnecting || !isMetaMaskAvailable}
-          >
-            <FaWallet /> {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-          </button>
-        )}
-        <button
-          className="theme-toggle"
-          onClick={() => {
-            toggleTheme();
-            setIsMenuOpen(false);
-          }}
-        >
+          )}
+        </div>
+        
+        <button className="theme-toggle" onClick={toggleTheme}>
           {theme === 'dark' ? <IoSunny /> : <IoMoon />}
         </button>
       </div>
