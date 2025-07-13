@@ -104,8 +104,8 @@ function Faucet({ walletData }) {
         signer
       );
 
-      // Assuming the faucet contract has a `claim` function that takes a token address
-      const tx = await faucetContract.claim(claim.address);
+      // Baris ini sudah diperbaiki, menggunakan claimFaucet()
+      const tx = await faucetContract.claimFaucet(claim.address);
       await tx.wait();
 
       toast.success(`Successfully claimed ${claim.symbol}!`, { position: 'bottom-right' });
