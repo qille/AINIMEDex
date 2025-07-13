@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './style/ToastifyCustom.css'; 
+import './style/ToastifyCustom.css';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from 'ethers';
 
@@ -11,34 +11,32 @@ import Liquidity from './components/Liquidity';
 import LiquidityPage from './components/LiquidityPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import FaucetForm from './components/FaucetForm';
 import PairPool from './components/PairPool';
+import ClaimListModal from './components/ClaimListModal';
 
 import './index.css';
 
 function App() {
-  const [showFaucetModal, setShowFaucetModal] = useState(false);
   const [walletData, setWalletData] = useState({
     address: '',
     chainId: '',
     isConnected: false,
   });
-  const [theme, setTheme] = useState('dark'); // Tambahkan state tema
+  const [theme, setTheme] = useState('dark');
   const navigate = useNavigate();
 
   useEffect(() => {
     const initWallet = async () => {
       try {
-        const provider = await detectEthereumProvider();
+        const provider = await detectEthereumProvider({ timeout: 2000 });
         if (provider) {
-          const web3Provider = new ethers.providers.Web3Provider(provider, 'any');
           const accounts = await provider.request({ method: 'eth_accounts' });
           const chainId = await provider.request({ method: 'eth_chainId' });
 
           if (accounts.length > 0) {
             setWalletData({
-              address: accounts[0],
-              chainId: chainId,
+              address: ethers.utils.getAddress(accounts[0]),
+              chainId,
               isConnected: true,
             });
           }
@@ -46,7 +44,7 @@ function App() {
           provider.on('accountsChanged', (accounts) => {
             setWalletData((prev) => ({
               ...prev,
-              address: accounts[0] || '',
+              address: accounts[0] ? ethers.utils.getAddress(accounts[0]) : '',
               isConnected: !!accounts[0],
             }));
           });
@@ -54,14 +52,14 @@ function App() {
           provider.on('chainChanged', (chainId) => {
             setWalletData((prev) => ({
               ...prev,
-              chainId: chainId,
+              chainId,
             }));
           });
         } else {
-          console.error('MetaMask tidak terdeteksi.');
+          console.error('MetaMask not detected.');
         }
       } catch (error) {
-        console.error('Gagal menginisialisasi wallet:', error);
+        console.error('Failed to initialize wallet:', error);
       }
     };
 
@@ -80,61 +78,31 @@ function App() {
     });
   };
 
-  const handleFaucetModalClose = () => {
-    setShowFaucetModal(false);
-    navigate('/'); // Arahkan kembali ke halaman Swap
-  };
-
   const handleThemeToggle = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    document.body.className = newTheme; // Terapkan tema ke body
+    document.body.className = newTheme;
   };
 
   return (
     <div className="app-container">
       <Navbar
-        setShowFaucetModal={setShowFaucetModal}
         onWalletDataChange={handleWalletDataChange}
-        onFaucetModalClose={handleFaucetModalClose}
         theme={theme}
         toggleTheme={handleThemeToggle}
       />
       <main className="main-content">
         <Routes>
-          <Route
-            path="/"
-            element={
-              <SwapForm
-                setShowFaucetModal={setShowFaucetModal}
-                walletData={walletData}
-              />
-            }
-          />
-          <Route
-            path="/liquidity"
-            element={<Liquidity walletData={walletData} />}
-          />
-          <Route
-            path="/liquidity/:pairAddress"
-            element={<LiquidityPage walletData={walletData} />}
-          />
-          <Route
-            path="/pair"
-            element={<PairPool walletData={walletData} />}
-          />
+          <Route path="/" element={<SwapForm walletData={walletData} />} />
+          <Route path="/liquidity" element={<Liquidity walletData={walletData} />} />
+          <Route path="/liquidity/:pairAddress" element={<LiquidityPage walletData={walletData} />} />
+          <Route path="/pair" element={<PairPool walletData={walletData} />} />
           <Route
             path="/faucet"
-            element={<div>{/* Placeholder untuk rute faucet */}</div>}
+            element={<ClaimListModal walletData={walletData} />}
           />
         </Routes>
       </main>
-      {showFaucetModal && (
-        <FaucetForm
-          onClose={handleFaucetModalClose}
-          walletData={walletData}
-        />
-      )}
       <Footer />
       <ToastContainer
         position="bottom-left"
@@ -146,7 +114,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme={theme} // Gunakan tema dari state
+        theme={theme}
         limit={1}
       />
     </div>
