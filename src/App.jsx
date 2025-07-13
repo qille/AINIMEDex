@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './style/ToastifyCustom.css';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from 'ethers';
 
-// Mengimpor semua komponen
+
 import SwapForm from './components/SwapForm';
 import Liquidity from './components/Liquidity';
 import LiquidityPage from './components/LiquidityPage';
