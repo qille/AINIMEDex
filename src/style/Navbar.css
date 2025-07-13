@@ -118,11 +118,11 @@ body.light .menu-items.open {
   }
 }
 
-.wallet-info {
+/* KODE YANG DIUBAH: Menggunakan class baru .wallet-container */
+.wallet-container {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
+  gap: 0.5rem; /* Menambahkan jarak antara tombol */
 }
 
 .menu-btn {
@@ -159,7 +159,7 @@ body.light .menu-btn {
 }
 
 .menu-btn.active {
-  background: #007bff; /* Warna biru untuk status aktif */
+  background: #007bff;
   border: none;
   color: #ffffff;
 }
@@ -279,10 +279,22 @@ body.light .theme-toggle {
     width: 100%;
   }
 
+  /* KODE BARU: Menjamin tombol wallet tetap di satu baris saat menu responsif terbuka */
+  .menu-items.open .wallet-container {
+    flex-direction: row; /* Memaksa tata letak baris */
+    width: 100%; /* Memastikan kontainer mengisi lebar penuh */
+    justify-content: center; /* Menengahkan tombol di layar kecil */
+    flex-wrap: wrap; /* Mengatur pembungkusan jika layarnya terlalu kecil */
+  }
+
   .menu-btn {
     padding: 0.5rem 0.8rem;
     font-size: 0.85rem;
     min-height: 36px;
+  }
+  
+  .menu-items.open .menu-btn {
+      width: auto;
   }
 
   .theme-toggle {
