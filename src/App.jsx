@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './style/ToastifyCustom.css';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from 'ethers';
-
 
 import SwapForm from './components/SwapForm';
 import Liquidity from './components/Liquidity';
@@ -13,7 +12,8 @@ import LiquidityPage from './components/LiquidityPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PairPool from './components/PairPool';
-import Faucet from './components/Faucet'; // Mengubah nama impor agar lebih konsisten
+import Faucet from './components/Faucet';
+import NotFound from './components/NotFound'; // Impor komponen NotFound
 
 import './index.css';
 
@@ -24,9 +24,6 @@ function App() {
     isConnected: false,
   });
   const [theme, setTheme] = useState('dark');
-  
-  // Menghapus 'useNavigate' di sini karena tidak digunakan di level App
-  // dan lebih baik digunakan di komponen yang membutuhkannya.
 
   useEffect(() => {
     const initWallet = async () => {
@@ -44,7 +41,6 @@ function App() {
             });
           }
 
-          // Menambahkan cleanup function untuk event listener
           const handleAccountsChanged = (accounts) => {
             setWalletData((prev) => ({
               ...prev,
@@ -63,14 +59,12 @@ function App() {
           provider.on('accountsChanged', handleAccountsChanged);
           provider.on('chainChanged', handleChainChanged);
 
-          // Cleanup function
           return () => {
             if (provider.removeListener) {
               provider.removeListener('accountsChanged', handleAccountsChanged);
               provider.removeListener('chainChanged', handleChainChanged);
             }
           };
-
         } else {
           console.error('MetaMask not detected.');
         }
@@ -113,10 +107,8 @@ function App() {
           <Route path="/liquidity" element={<Liquidity walletData={walletData} />} />
           <Route path="/liquidity/:pairAddress" element={<LiquidityPage walletData={walletData} />} />
           <Route path="/pair" element={<PairPool walletData={walletData} />} />
-          <Route
-            path="/faucet"
-            element={<Faucet walletData={walletData} />} // Menggunakan nama komponen 'Faucet'
-          />
+          <Route path="/faucet" element={<Faucet walletData={walletData} />} />
+          <Route path="*" element={<NotFound />} /> {/* Rute untuk 404 */}
         </Routes>
       </main>
       <Footer />
