@@ -6,59 +6,9 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import AINIMEDexRouterABI from '../abi_json/AINIMEDex_Router.json';
 import AINIMEDexPairABI from '../abi_json/AINIMEDex_Pair.json';
 import ERC20ABI from '../abi_json/ERC20.json';
-import usdtLogo from '../assets/evm-tokens/usdt-logo.png';
-import aineLogo from '../assets/evm-tokens/aine-logo.gif';
-import ogaineLogo from '../assets/evm-tokens/ogaine-logo.png';
-import btcLogo from '../assets/evm-tokens/btc-logo.png';
-import ethLogo from '../assets/evm-tokens/eth-logo.png';
-import suiLogo from '../assets/evm-tokens/sui-logo.png';
 import styles from '../style/AddLiquidity.module.css';
 import { showNotification, retryWithBackoff, debounce } from '../utils/helpers';
-
-export const tokens = [
-  {
-    address: '0xAACDf6B66B1b451B43FDA6270548783F642833C5',
-    symbol: 'USDTaine',
-    name: 'USDT',
-    logo: usdtLogo,
-    decimals: 6,
-  },
-  {
-    address: '0x1a0326c89c000C18794dD012D5055d9D16900f77',
-    symbol: 'AINIME',
-    name: 'AINIME',
-    logo: aineLogo,
-    decimals: 18,
-  },
-  {
-    address: '0xd2476F4d3D5479982Df08382A4063018A9b7483c',
-    symbol: 'OGaine',
-    name: 'OG AINIME',
-    logo: ogaineLogo,
-    decimals: 18,
-  },
-  {
-    address: '0xA5e937cbEC05EB8F71Ae8388645976A16046667b',
-    symbol: 'BTCaine',
-    name: 'BITCOIN',
-    logo: btcLogo,
-    decimals: 18,
-  },
-  {
-    address: '0x832b82d71296577E7b5272ef2884F2E5EAE66065',
-    symbol: 'ETHaine',
-    name: 'ETHEREUM',
-    logo: ethLogo,
-    decimals: 18,
-  },
-  {
-    address: '0x4d3c3362397A8869C3EdD4d1c36B4Ccf20339a26',
-    symbol: 'SUIaine',
-    name: 'SUI AINIME',
-    logo: suiLogo,
-    decimals: 18,
-  },
-];
+import { tokens } from '../utils/tokens'; // Impor tokens dari file terpusat
 
 function AddLiquidity({ walletData, pairData }) {
   const [amount0, setAmount0] = useState('');
@@ -103,10 +53,18 @@ function AddLiquidity({ walletData, pairData }) {
   }, []);
 
   useEffect(() => {
-    if (!pairData) {
-      showNotification('Data pair tidak ditemukan.', 'error');
+    if (
+      !pairData ||
+      !pairData.pairAddress ||
+      !pairData.token0 ||
+      !pairData.token1 ||
+      !pairData.pairName
+    ) {
+      console.error('Data pair tidak lengkap:', pairData);
+      showNotification('Data pair tidak ditemukan atau tidak lengkap.', 'error');
       navigate('/liquidity');
     } else {
+      console.log('Pair data diterima:', pairData);
       setIsNewPair(!pairData.pairAddress || pairData.status === 'Not Created');
     }
   }, [pairData, navigate]);
@@ -143,6 +101,7 @@ function AddLiquidity({ walletData, pairData }) {
 
         setToken0Balance(formattedBalance0);
         setToken1Balance(formattedBalance1);
+        console.log('Saldo token:', { token0: formattedBalance0, token1: formattedBalance1 });
       } catch (error) {
         console.error('Gagal mengambil saldo:', error);
         showNotification('Gagal mengambil saldo token.', 'error');
@@ -170,6 +129,7 @@ function AddLiquidity({ walletData, pairData }) {
         } else {
           setIsNewPair(false);
         }
+        console.log('Status pair:', { pairAddress, isNewPair: pairAddress === ethers.constants.AddressZero });
       } catch (error) {
         console.error('Gagal memverifikasi pair:', error);
         showNotification(`Gagal memverifikasi status pair: ${error.message}`, 'error');
@@ -212,6 +172,7 @@ function AddLiquidity({ walletData, pairData }) {
         } else {
           setAmount0(amountOut.toFixed(6));
         }
+        console.log('Hasil perhitungan jumlah pasangan:', { amountIn, amountOut, isToken0Input });
       } catch (error) {
         console.error('Gagal menghitung jumlah pasangan:', error);
         showNotification('Gagal menghitung jumlah pasangan. Masukkan jumlah kedua token secara manual.', 'warning');
