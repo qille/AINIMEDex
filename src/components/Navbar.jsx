@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { toast } from 'react-toastify';
@@ -10,49 +10,60 @@ import { IoSunny, IoMoon } from 'react-icons/io5';
 import AINIMELogo from '../assets/evm-tokens/ainime-logo.gif';
 import '../style/Navbar.css';
 
-function Navbar({ setShowFaucetModal, onWalletDataChange, theme, toggleTheme }) {
-  const [walletData, setWalletData] = useState({
-    address: '',
-    chainId: '',
-  });
+// Konfigurasi jaringan
+const galileoTestnet = {
+  chainId: '0x40D9',
+  chainName: '0G Galileo Testnet',
+  nativeCurrency: { name: 'OG', symbol: 'OG', decimals: 18 },
+  rpcUrls: ['https://rpc-testnet.0g.ai'],
+  blockExplorerUrls: ['https://explorer.0g.ai'],
+};
+
+// --- Komponen Navbar ---
+function Navbar({ onWalletDataChange, theme, toggleTheme }) {
+  // State untuk mengelola UI dan data wallet
+  const [walletData, setWalletData] = useState({ address: '', chainId: '' });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isMetaMaskAvailable, setIsMetaMaskAvailable] = useState(false);
+  const navigate = useNavigate();
+
+  // Memeriksa status disconect dari localStorage saat inisialisasi
   const [isDisconnected, setIsDisconnected] = useState(
     localStorage.getItem('isDisconnected') === 'true'
   );
-  const navigate = useNavigate();
 
-  const galileoTestnet = {
-    chainId: '0x40D9',
-    chainName: '0G Galileo Testnet',
-    nativeCurrency: { name: 'OG', symbol: 'OG', decimals: 18 },
-    rpcUrls: ['https://rpc-testnet.0g.ai'],
-    blockExplorerUrls: ['https://explorer.0g.ai'],
-  };
+  // --- Fungsi untuk memutus koneksi wallet ---
+  const disconnectWallet = useCallback(() => {
+    setWalletData({ address: '', chainId: '' });
+    onWalletDataChange({ address: '', chainId: '' });
+    setIsDisconnected(true);
+    localStorage.setItem('isDisconnected', 'true');
+    toast.info('Wallet disconnected.', { position: 'bottom-left' });
+    
+    // Muat ulang browser setelah putus koneksi
+    window.location.reload(); 
+  }, [onWalletDataChange]);
 
+  // --- Fungsi untuk menyambungkan wallet ---
   const connectWallet = useCallback(async () => {
-    if (isConnecting) return;
+    if (isConnecting) return; // Mencegah klik ganda
     setIsConnecting(true);
-    setIsDisconnected(false);
-    localStorage.setItem('isDisconnected', 'false');
 
     try {
-      const provider = await detectEthereumProvider({ timeout: 5000 });
+      const provider = await detectEthereumProvider({ timeout: 2000 });
       if (!provider) {
         setIsMetaMaskAvailable(false);
-        toast.error('MetaMask not available. Please install MetaMask.', { position: 'bottom-left' });
+        toast.error('MetaMask not available. Please install MetaMask.', {
+          position: 'bottom-left',
+        });
         return;
       }
-
       setIsMetaMaskAvailable(true);
 
-      // LANGKAH 1: Meminta akun dan memberikan feedback cepat
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       const address = ethers.utils.getAddress(accounts[0]);
-      toast.success('Wallet connected. Please approve network switch.', { position: 'bottom-left' });
 
-      // LANGKAH 2: Cek dan switch/tambahkan network
       const currentChainId = await provider.request({ method: 'eth_chainId' });
       if (currentChainId.toLowerCase() !== galileoTestnet.chainId.toLowerCase()) {
         try {
@@ -60,123 +71,131 @@ function Navbar({ setShowFaucetModal, onWalletDataChange, theme, toggleTheme }) 
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: galileoTestnet.chainId }],
           });
-          toast.success('Successfully switched to Galileo Testnet.', { position: 'bottom-left' });
         } catch (switchError) {
-          if (switchError.code === 4902) { // Kode untuk network yang belum ada
+          if (switchError.code === 4902) {
             await provider.request({
               method: 'wallet_addEthereumChain',
               params: [galileoTestnet],
             });
-            toast.success('Added and switched to Galileo Testnet.', { position: 'bottom-left' });
+            toast.success('Galileo Testnet has been added!', { position: 'bottom-left' });
           } else {
-            // Error jika pengguna menolak switch
-            toast.error('Failed to switch network. Please switch manually.', { position: 'bottom-left' });
-            // Kita tetap lanjutkan dengan akun yang sudah terhubung
+            toast.error('Please switch to Galileo Testnet manually.', {
+              position: 'bottom-left',
+            });
+            throw switchError; // Lemparkan error untuk ditangkap di blok catch utama
           }
         }
       }
 
-      // LANGKAH 3: Perbarui state setelah semua proses selesai
       const finalChainId = await provider.request({ method: 'eth_chainId' });
       const newWalletData = { address, chainId: finalChainId };
       setWalletData(newWalletData);
       onWalletDataChange(newWalletData);
-      // Notifikasi final bisa diganti atau dihapus karena sudah ada notif sebelumnya
-      // toast.success(`Connected to ${address.substring(0, 6)}...${address.substring(38)}`, { position: 'bottom-left' });
+      toast.success(`Connected: ${address.slice(0, 6)}...${address.slice(-4)}`, {
+        position: 'bottom-left',
+      });
+      setIsDisconnected(false);
+      localStorage.setItem('isDisconnected', 'false');
 
     } catch (error) {
       console.error('Error connecting wallet:', error);
       toast.error('Failed to connect wallet.', { position: 'bottom-left' });
     } finally {
-      setIsConnecting(false);
+      setIsConnecting(false); // Pastikan state ini selalu diatur kembali
     }
   }, [isConnecting, onWalletDataChange]);
 
-  const disconnectWallet = useCallback(() => {
-    setWalletData({ address: '', chainId: '' });
-    onWalletDataChange({ address: '', chainId: '' });
-    setIsDisconnected(true);
-    localStorage.setItem('isDisconnected', 'true');
-    window.location.reload();
-  }, [onWalletDataChange]);
-
-  const checkAndConnect = useCallback(async () => {
-    const provider = await detectEthereumProvider({ timeout: 5000 });
+  // --- Fungsi untuk memeriksa status koneksi saat dimuat atau berubah ---
+  const checkConnectionStatus = useCallback(async () => {
+    // Jika isDisconnected true, jangan lakukan pemeriksaan otomatis
+    if (isDisconnected) {
+      setIsMetaMaskAvailable(true); // Biarkan tombol tetap aktif
+      return;
+    }
+    
+    const provider = await detectEthereumProvider({ timeout: 2000 });
     if (provider && provider.isMetaMask) {
       setIsMetaMaskAvailable(true);
-      if (!isDisconnected) {
-        try {
-          const accounts = await provider.request({ method: 'eth_accounts' });
-          if (accounts.length > 0) {
-            const newChainId = await provider.request({ method: 'eth_chainId' });
-            const newWalletData = { address: ethers.utils.getAddress(accounts[0]), chainId: newChainId };
-            setWalletData(newWalletData);
-            onWalletDataChange(newWalletData);
-          } else {
-            disconnectWallet();
-          }
-        } catch (error) {
-          console.error('Error checking MetaMask status:', error);
+      try {
+        const accounts = await provider.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          const chainId = await provider.request({ method: 'eth_chainId' });
+          const newWalletData = {
+            address: ethers.utils.getAddress(accounts[0]),
+            chainId,
+          };
+          setWalletData(newWalletData);
+          onWalletDataChange(newWalletData);
+        } else {
+          // Jika tidak ada akun yang terhubung, putuskan koneksi
           disconnectWallet();
         }
+      } catch (error) {
+        console.error('Error checking MetaMask status:', error);
+        disconnectWallet();
       }
     } else {
       setIsMetaMaskAvailable(false);
     }
   }, [isDisconnected, onWalletDataChange, disconnectWallet]);
 
-  const debouncedHandleChainChanged = useCallback(debounce((newChainId) => {
-    if (walletData.address && !isDisconnected) {
-      if (newChainId.toLowerCase() !== galileoTestnet.chainId.toLowerCase()) {
-        toast.error('Wrong network detected. Please switch to Galileo Testnet.', {
-          position: 'bottom-left',
-        });
-      } else {
-        const newWalletData = { ...walletData, chainId: newChainId };
-        setWalletData(newWalletData);
-        onWalletDataChange(newWalletData);
-        toast.success('Successfully switched to Galileo Testnet.', {
-          position: 'bottom-left',
-        });
-      }
-    }
-  }, 500), [walletData, isDisconnected, onWalletDataChange]);
+  // --- Debounce untuk event listener ---
+  const debouncedHandleChainChanged = useMemo(
+    () =>
+      debounce((newChainId) => {
+        if (walletData.address) {
+          if (newChainId.toLowerCase() !== galileoTestnet.chainId.toLowerCase()) {
+            toast.error('Wrong network. Please switch to Galileo Testnet.', {
+              position: 'bottom-left',
+            });
+          }
+          const newWalletData = { ...walletData, chainId: newChainId };
+          setWalletData(newWalletData);
+          onWalletDataChange(newWalletData);
+        }
+      }, 300),
+    [walletData.address, onWalletDataChange]
+  );
 
-  const debouncedHandleAccountsChanged = useCallback(debounce(async (accounts) => {
-    if (accounts.length === 0) {
-      disconnectWallet();
-    } else {
-      const provider = await detectEthereumProvider({ timeout: 5000 });
-      if (provider) {
-        const newChainId = await provider.request({ method: 'eth_chainId' });
-        const newWalletData = { address: ethers.utils.getAddress(accounts[0]), chainId: newChainId };
-        setWalletData(newWalletData);
-        onWalletDataChange(newWalletData);
-      }
-    }
-  }, 500), [disconnectWallet, onWalletDataChange]);
+  const debouncedHandleAccountsChanged = useMemo(
+    () =>
+      debounce(async (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          const provider = await detectEthereumProvider({ timeout: 2000 });
+          if (provider) {
+            const newChainId = await provider.request({ method: 'eth_chainId' });
+            const newWalletData = {
+              address: ethers.utils.getAddress(accounts[0]),
+              chainId: newChainId,
+            };
+            setWalletData(newWalletData);
+            onWalletDataChange(newWalletData);
+          }
+        }
+      }, 300),
+    [disconnectWallet, onWalletDataChange]
+  );
 
+  // --- Efek samping: memeriksa koneksi dan menyiapkan listener ---
   useEffect(() => {
-    checkAndConnect();
+    checkConnectionStatus();
 
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', debouncedHandleAccountsChanged);
       window.ethereum.on('chainChanged', debouncedHandleChainChanged);
-      
+
       return () => {
-        if (window.ethereum && window.ethereum.removeListener) {
+        if (window.ethereum?.removeListener) {
           window.ethereum.removeListener('accountsChanged', debouncedHandleAccountsChanged);
           window.ethereum.removeListener('chainChanged', debouncedHandleChainChanged);
         }
       };
     }
-  }, [checkAndConnect, debouncedHandleAccountsChanged, debouncedHandleChainChanged]);
+  }, [checkConnectionStatus, debouncedHandleAccountsChanged, debouncedHandleChainChanged]);
 
-  const handleFaucetClick = () => {
-    setShowFaucetModal(true);
-    setIsMenuOpen(false);
-  };
-
+  // --- Render Komponen ---
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -207,7 +226,7 @@ function Navbar({ setShowFaucetModal, onWalletDataChange, theme, toggleTheme }) 
         <NavLink
           to="/faucet"
           className={({ isActive }) => `menu-btn faucet-btn ${isActive ? 'active' : ''}`}
-          onClick={handleFaucetClick}
+          onClick={() => setIsMenuOpen(false)}
         >
           <FaFaucet /> Claim Faucet
         </NavLink>
@@ -232,7 +251,6 @@ function Navbar({ setShowFaucetModal, onWalletDataChange, theme, toggleTheme }) 
                 disconnectWallet();
                 setIsMenuOpen(false);
               }}
-              disabled={isConnecting}
             >
               Disconnect
             </button>
