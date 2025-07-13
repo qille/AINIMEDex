@@ -48,8 +48,16 @@ function RemoveLiquidity({ walletData, pairData }) {
   }, []);
 
   useEffect(() => {
-    if (!pairData || !pairData.pairAddress || pairData.pairAddress === 'Not Created') {
-      showNotification('Data pair tidak ditemukan atau pair belum dibuat.', 'error');
+    if (
+      !pairData ||
+      !pairData.pairAddress ||
+      pairData.pairAddress === 'Not Created' ||
+      !pairData.token0 ||
+      !pairData.token1 ||
+      !pairData.pairName
+    ) {
+      console.error('Data pair tidak lengkap:', pairData);
+      showNotification('Data pair tidak ditemukan atau tidak lengkap.', 'error');
       navigate('/liquidity');
     }
   }, [pairData, navigate]);
