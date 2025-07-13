@@ -6,7 +6,7 @@ import RemoveLiquidity from './RemoveLiquidity';
 import styles from '../style/AddLiquidity.module.css';
 import { showNotification, retryWithBackoff } from '../utils/helpers';
 import AINIMEDexPairABI from '../abi_json/AINIMEDex_Pair.json';
-import { tokens } from './AddLiquidity';
+import { tokens } from '../utils/tokens'; // Impor tokens dari file terpusat
 
 function LiquidityPage({ walletData }) {
   const { pairAddress } = useParams();
@@ -17,12 +17,14 @@ function LiquidityPage({ walletData }) {
   useEffect(() => {
     const fetchPairData = async () => {
       if (!pairAddress || !ethers.utils.isAddress(pairAddress)) {
+        console.error('Alamat pair tidak valid:', pairAddress);
         showNotification('Alamat pair tidak valid.', 'error');
         navigate('/liquidity');
         return;
       }
 
       try {
+        console.log('Mengambil data untuk pairAddress:', pairAddress);
         const provider = new ethers.providers.JsonRpcProvider('https://evmrpc-testnet.0g.ai/', {
           chainId: parseInt('0x40d9', 16),
           name: 'OG Galileo Testnet',
@@ -35,11 +37,14 @@ function LiquidityPage({ walletData }) {
           retryWithBackoff(() => pairContract.token1()),
           retryWithBackoff(() => pairContract.getLPTokenDetails()),
         ]);
+        console.log('Data kontrak:', { token0Address, token1Address, lpDetails });
 
         const token0 = tokens.find((t) => t.address.toLowerCase() === token0Address.toLowerCase());
         const token1 = tokens.find((t) => t.address.toLowerCase() === token1Address.toLowerCase());
+        console.log('Token ditemukan:', { token0, token1 });
 
         if (!token0 || !token1) {
+          console.error('Token tidak ditemukan:', { token0Address, token1Address });
           showNotification('Token tidak ditemukan dalam daftar.', 'error');
           navigate('/liquidity');
           return;
@@ -52,7 +57,7 @@ function LiquidityPage({ walletData }) {
         };
 
         const newPairData = {
-          pairAddress,
+          pairAddress: pairAddress, // Perbaikan typo
           pairName: `${token0.symbol}/${token1.symbol}`,
           token0,
           token1,
@@ -71,12 +76,16 @@ function LiquidityPage({ walletData }) {
       }
     };
 
+    console.log('Location state:', location.state);
+    console.log('Pair address:', pairAddress);
     if (location.state && location.state.pair) {
+      console.log('Menggunakan state.pair:', location.state.pair);
       setPairData(location.state.pair);
-    } else if (pairAddress && pairAddress !== 'Not Created') {
+    } else if (pairAddress && pairAddress !== 'Not Created' && ethers.utils.isAddress(pairAddress)) {
       fetchPairData();
     } else {
-      showNotification('Data pair tidak ditemukan.', 'error');
+      console.error('Data pair tidak valid:', { pairAddress });
+      showNotification('Data pair tidak ditemukan atau alamat tidak valid.', 'error');
       navigate('/liquidity');
     }
   }, [pairAddress, location.state, navigate]);
