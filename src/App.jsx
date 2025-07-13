@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './style/ToastifyCustom.css';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from 'ethers';
 
+// Mengimpor semua komponen
 import SwapForm from './components/SwapForm';
 import Liquidity from './components/Liquidity';
 import LiquidityPage from './components/LiquidityPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PairPool from './components/PairPool';
-import ClaimListModal from './components/ClaimListModal';
+import Faucet from './components/Faucet'; // Mengubah nama impor agar lebih konsisten
 
 import './index.css';
 
@@ -23,7 +24,9 @@ function App() {
     isConnected: false,
   });
   const [theme, setTheme] = useState('dark');
-  const navigate = useNavigate();
+  
+  // Menghapus 'useNavigate' di sini karena tidak digunakan di level App
+  // dan lebih baik digunakan di komponen yang membutuhkannya.
 
   useEffect(() => {
     const initWallet = async () => {
@@ -41,20 +44,33 @@ function App() {
             });
           }
 
-          provider.on('accountsChanged', (accounts) => {
+          // Menambahkan cleanup function untuk event listener
+          const handleAccountsChanged = (accounts) => {
             setWalletData((prev) => ({
               ...prev,
               address: accounts[0] ? ethers.utils.getAddress(accounts[0]) : '',
               isConnected: !!accounts[0],
             }));
-          });
+          };
 
-          provider.on('chainChanged', (chainId) => {
+          const handleChainChanged = (newChainId) => {
             setWalletData((prev) => ({
               ...prev,
-              chainId,
+              chainId: newChainId,
             }));
-          });
+          };
+
+          provider.on('accountsChanged', handleAccountsChanged);
+          provider.on('chainChanged', handleChainChanged);
+
+          // Cleanup function
+          return () => {
+            if (provider.removeListener) {
+              provider.removeListener('accountsChanged', handleAccountsChanged);
+              provider.removeListener('chainChanged', handleChainChanged);
+            }
+          };
+
         } else {
           console.error('MetaMask not detected.');
         }
@@ -99,7 +115,7 @@ function App() {
           <Route path="/pair" element={<PairPool walletData={walletData} />} />
           <Route
             path="/faucet"
-            element={<ClaimListModal walletData={walletData} />}
+            element={<Faucet walletData={walletData} />} // Menggunakan nama komponen 'Faucet'
           />
         </Routes>
       </main>
