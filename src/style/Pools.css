@@ -1,0 +1,327 @@
+/* Pools Card */
+.pools-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 30px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(168, 8, 154, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+body.light .pools-card {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(168, 8, 154, 0.6);
+}
+
+.pools-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pools-container h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+body.light .pools-container h3 {
+  color: #333333;
+}
+
+.pools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.pool-item {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  height: 200px; /* Ukuran tetap */
+  width: 100%;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pool-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(168, 8, 154, 0.3);
+}
+
+body.light .pool-item {
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.pool-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pair-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+body.light .pair-name {
+  color: #333333;
+}
+
+.pool-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.total-liquidity {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.light .total-liquidity {
+  color: rgba(51, 51, 51, 0.7);
+}
+
+.ainep-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.light .ainep-info {
+  color: rgba(51, 51, 51, 0.7);
+}
+
+.ainep-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.token-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.no-logo {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+}
+
+body.light .no-logo {
+  color: rgba(51, 51, 51, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.pool-address {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  word-break: break-all;
+}
+
+body.light .pool-address {
+  color: rgba(51, 51, 51, 0.7);
+}
+
+.coming-soon {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.8), 0 0 12px rgba(0, 255, 136, 0.6);
+  }
+  to {
+    text-shadow: 0 0 12px rgba(0, 255, 136, 1), 0 0 16px rgba(0, 255, 136, 0.8);
+  }
+}
+
+.deposit-button,
+.withdraw-button {
+  background: linear-gradient(90deg, #ff007a, #007bff);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deposit-button:hover,
+.withdraw-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 0, 122, 0.3);
+}
+
+/* Swap Header */
+.swap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.light .tab-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333333;
+}
+
+.tab-button:hover {
+  background: rgba(168, 8, 154, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 8, 154, 0.3);
+}
+
+.tab-button.active {
+  background: linear-gradient(90deg, #ff007a, #007bff);
+  color: #ffffff;
+}
+
+.network-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.pulse {
+  width: 10px;
+  height: 10px;
+  background: #00ff88;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.settings-btn,
+.history-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+body.light .settings-btn,
+body.light .history-btn {
+  color: #333333;
+}
+
+.settings-btn:hover,
+.history-btn:hover {
+  color: #a8089a;
+  transform: scale(1.2);
+}
+
+/* Error Card */
+.error-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(168, 8, 154, 0.6);
+  text-align: center;
+  margin: 0 auto;
+}
+
+body.light .error-card {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(168, 8, 154, 0.6);
+}
+
+.error-card h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ff007a;
+  margin-bottom: 1rem;
+}
+
+.error-card p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+}
+
+body.light .error-card p {
+  color: rgba(51, 51, 51, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pools-card {
+    width: 95%;
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .pools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .pools-grid {
+    grid-template-columns: 1fr;
+  }
+}

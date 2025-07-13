@@ -1,0 +1,236 @@
+.deposit-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 450px;
+  margin: 20px auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(168, 8, 154, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+body.light .deposit-card {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(168, 8, 154, 0.2);
+}
+
+.deposit-card h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+body.light .deposit-card h2 {
+  color: #111;
+}
+
+.token-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.token-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.token-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.deposit-input label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+body.light .deposit-input label {
+  color: #111;
+}
+
+.token-contract {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+body.light .token-contract {
+  color: rgba(17, 17, 17, 0.5);
+}
+
+.token-balance {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.light .token-balance {
+  color: rgba(17, 17, 17, 0.6);
+}
+
+.deposit-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.deposit-input input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.6rem;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+body.light .deposit-input input {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #111;
+}
+
+.deposit-input input:hover,
+.deposit-input input:focus {
+  border-color: #a8089a;
+}
+
+.deposit-input input:disabled {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+body.light .deposit-input input:disabled {
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(17, 17, 17, 0.4);
+}
+
+.percentage-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.percentage-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  flex: 1;
+}
+
+body.light .percentage-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.percentage-btn:hover {
+  background: rgba(168, 8, 154, 0.15);
+  transform: translateY(-1px);
+}
+
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.confirm-button,
+.cancel-button {
+  background: linear-gradient(90deg, #ff007a, #007bff);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  flex: 1;
+}
+
+.cancel-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.light .cancel-button {
+  background: rgba(0, 0, 0, 0.04);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.confirm-button:hover,
+.cancel-button:hover {
+  transform: translateY(-1px);
+}
+
+.confirm-button:disabled,
+.cancel-button:disabled {
+  background: rgba(255, 255, 255, 0.15);
+  cursor: not-allowed;
+}
+
+body.light .confirm-button:disabled,
+body.light .cancel-button:disabled {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+  .deposit-card {
+    width: 90%;
+    padding: 16px;
+  }
+
+  .deposit-card h2 {
+    font-size: 1.3rem;
+  }
+
+  .deposit-input input {
+    font-size: 0.9rem;
+  }
+
+  .percentage-btn {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .deposit-card {
+    width: 95%;
+    padding: 12px;
+  }
+
+  .token-info {
+    flex-wrap: wrap;
+  }
+
+  .token-details {
+    width: 100%;
+  }
+
+  .token-contract,
+  .token-balance {
+    width: 100%;
+    text-align: left;
+  }
+
+  .percentage-buttons {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .percentage-btn {
+    flex: 1 1 45%;
+  }
+}

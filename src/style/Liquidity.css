@@ -1,0 +1,379 @@
+/* General Styling */
+.liquidity-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1000px;
+  min-height: calc(100vh - 120px); /* Navbar 56px + Footer 48px + margin bawah 16px */
+  margin: 56px auto 32px; /* Margin-bottom untuk jarak dari footer */
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.2);
+  font-family: 'Inter', sans-serif;
+}
+
+body.light .liquidity-container {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
+.liquidity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tab-button {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.light .tab-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.tab-button:hover {
+  background: #6b7280;
+}
+
+.tab-button.active {
+  background: #6b7280;
+  color: #ffffff;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.settings-btn, .history-btn {
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 6px;
+}
+
+body.light .settings-btn, body.light .history-btn {
+  color: #1f2937;
+}
+
+.settings-btn:hover, .history-btn:hover {
+  color: #6b7280;
+}
+
+/* Content */
+.pools-content {
+  padding: 0.4rem;
+  flex-grow: 1;
+}
+
+.pools-content h2 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #e5e7eb;
+  margin-bottom: 0.6rem;
+}
+
+body.light .pools-content h2 {
+  color: #1f2937;
+}
+
+.pools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  max-height: calc(100vh - 220px); /* Navbar 56px + Footer 48px + header 40px + padding 56px + margin-bottom 20px */
+  overflow-y: auto;
+  padding-bottom: 32px;
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 rgba(255, 255, 255, 0.1);
+}
+
+.pools-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pools-grid::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.light .pools-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.pools-grid::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 3px;
+}
+
+/* Pool Card */
+.pool-card, .my-pool-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+  transition: all 0.2s ease;
+}
+
+.my-pool-card {
+  min-height: 180px;
+}
+
+.pool-card:hover, .my-pool-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+body.light .pool-card, body.light .my-pool-card {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+body.light .pool-card:hover, body.light .my-pool-card:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.pool-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.token-logos {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.token-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: contain;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.pair-name {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #e5e7eb;
+  flex: 1;
+}
+
+body.light .pair-name {
+  color: #1f2937;
+}
+
+.coming-soon {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #10b981;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 4px rgba(16, 185, 129, 0.8); }
+  to { text-shadow: 0 0 6px rgba(16, 185, 129, 1); }
+}
+
+.pool-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.4rem;
+  flex-grow: 1;
+}
+
+.total-liquidity {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.light .total-liquidity {
+  color: rgba(28, 37, 38, 0.6);
+}
+
+.pool-actions {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  background: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  min-width: 60px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+body.light .action-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.action-button:hover:not(:disabled) {
+  background: #6b7280;
+}
+
+.action-button:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+
+body.light .action-button:disabled {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.action-button.deposit:hover:not(:disabled) {
+  background: #22c55e; /* Hijau */
+}
+
+.action-button.withdraw:hover:not(:disabled) {
+  background: #ef4444; /* Merah */
+}
+
+/* Loading and No Pools */
+.loading-message {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Sedikit lebih besar untuk kejelasan */
+  font-size: 0.9rem; /* Sedikit lebih besar untuk konsistensi */
+  color: #e5e7eb;
+  padding: 1rem;
+  min-height: 60px; /* Pastikan ada ruang cukup untuk ikon dan teks */
+}
+
+body.light .loading-message {
+  color: #1f2937;
+}
+
+.spinner {
+  font-size: 1rem; /* Ukuran lebih besar untuk visibilitas */
+  color: #3b82f6; /* Biru konsisten dengan SwapForm */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-pools {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.9rem; /* Sesuaikan dengan loading-message */
+  color: rgba(255, 255, 255, 0.7);
+  padding: 1rem;
+  min-height: 60px; /* Konsisten dengan loading-message */
+}
+
+body.light .no-pools {
+  color: rgba(28, 37, 38, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .pools-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-height: calc(100vh - 190px);
+    padding-bottom: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .liquidity-container {
+    max-width: 320px;
+    min-height: calc(100vh - 110px);
+    margin: 50px auto 48px;
+    padding: 0.7rem;
+  }
+  .pools-grid {
+    grid-template-columns: 1fr;
+    max-height: calc(100vh - 180px);
+    padding-bottom: 64px;
+  }
+  .pool-card, .my-pool-card {
+    min-height: 140px;
+  }
+  .my-pool-card {
+    min-height: 160px;
+  }
+  .pools-content h2 { font-size: 1rem; }
+  .pair-name { font-size: 0.65rem; }
+  .total-liquidity, .coming-soon { font-size: 0.6rem; }
+  .action-button { padding: 0.25rem 0.5rem; font-size: 0.6rem; min-width: 55px; }
+  .token-logo { width: 22px; height: 22px; }
+  .loading-message, .no-pools { font-size: 0.85rem; min-height: 50px; }
+  .spinner { font-size: 0.85rem; }
+}
+
+@media (max-width: 480px) {
+  .liquidity-container {
+    max-width: 280px;
+    min-height: calc(100vh - 100px);
+    margin: 48px auto 64px;
+    padding: 0.6rem;
+  }
+  .pools-grid {
+    max-height: calc(100vh - 170px);
+    padding-bottom: 80px;
+  }
+  .pools-content h2 { font-size: 0.95rem; }
+  .pair-name { font-size: 0.6rem; }
+  .total-liquidity, .coming-soon { font-size: 0.55rem; }
+  .action-button { font-size: 0.55rem; min-width: 50px; }
+  .loading-message, .no-pools { font-size: 0.8rem; min-height: 48px; }
+  .spinner { font-size: 0.8rem; }
+}
+
+@media (max-width: 360px) {
+  .liquidity-container {
+    max-width: 260px;
+    min-height: calc(100vh - 90px);
+    margin: 46px auto 80px;
+    padding: 0.5rem;
+  }
+  .pools-grid {
+    max-height: calc(100vh - 160px);
+    padding-bottom: 96px;
+  }
+  .pools-content h2 { font-size: 0.9rem; }
+  .token-logo { width: 20px; height: 20px; }
+  .loading-message, .no-pools { font-size: 0.75rem; min-height: 48px; }
+  .spinner { font-size: 0.75rem; }
+}

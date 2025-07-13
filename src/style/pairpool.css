@@ -1,0 +1,180 @@
+/* PairPool.css */
+.pairpool-card {
+  background-color: rgba(45, 55, 72, 0.95);
+  border-radius: 1rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+  margin: 2rem auto;
+  backdrop-filter: blur(8px);
+}
+
+.swap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.swap-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.network-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+.network-indicator .pulse {
+  width: 10px;
+  height: 10px;
+  background-color: #48bb78;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pairpool-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.token-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: #4a5568;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.token-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #e2e8f0;
+}
+
+.token-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.token-select {
+  width: 100%;
+  background-color: #2d3748;
+  color: #ffffff;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.token-select:focus {
+  box-shadow: 0 0 0 2px #4299e1;
+}
+
+.token-select option {
+  background-color: #2d3748;
+  color: #ffffff;
+}
+
+.balance {
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.plus-sign {
+  font-size: 1.5rem;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.pool-info {
+  background-color: #4a5568;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+.pool-info p {
+  margin: 0.25rem 0;
+}
+
+.burn-info {
+  color: #f6e05e;
+  font-style: italic;
+}
+
+.deposit-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4299e1;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.deposit-button:hover:not(:disabled) {
+  background-color: #2b6cb0;
+  transform: translateY(-2px);
+}
+
+.deposit-button:disabled {
+  background-color: #718096;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .pairpool-card {
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .swap-header h2 {
+    font-size: 1.25rem;
+  }
+}

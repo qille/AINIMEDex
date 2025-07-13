@@ -1,0 +1,60 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Batasi transisi untuk performa */
+  transition: color 0.3s ease, background 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Body Styling */
+body {
+  background: linear-gradient(135deg, #1a1b41, #4b3f72, #2e2e5e);
+  color: #e6e6fa;
+  height: 110vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body.light {
+  background: linear-gradient(135deg, #f0f2f5, #dfe4ea, #ffffff);
+  color: #1c2526;
+}
+
+/* App Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    /* Pastikan konten tetap responsif tanpa scroll */
+    max-height: calc(100vh - 100px);
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    max-height: calc(100vh - 80px);
+  }
+}
+
+@media (max-width: 360px) {
+  .main-content {
+    max-height: calc(100vh - 80px);
+  }
+}

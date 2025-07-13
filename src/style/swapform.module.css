@@ -1,0 +1,493 @@
+/* Swapform.module.css */
+
+/* Animasi untuk ikon loading multi-warna */
+@keyframes multi-color-spin {
+  0% {
+    transform: rotate(0deg);
+    border-top: 3px solid #60a5fa; /* Biru */
+  }
+  33% {
+    border-top: 3px solid #9c27b0; /* Ungu yang lebih pekat */
+  }
+  66% {
+    border-top: 3px solid #ffffff; /* Putih */
+  }
+  100% {
+    transform: rotate(360deg);
+    border-top: 3px solid #60a5fa; /* Kembali ke Biru */
+  }
+}
+
+/* Animasi untuk pulse pada network indicator */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.swap-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  min-height: calc(100vh - 104px); /* Navbar 56px + Footer ~48px */
+  padding: 0.5rem;
+  margin-top: 56px;
+  overflow: hidden;
+}
+
+/* Memisahkan properti swap-card dan error-card */
+.swap-card {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 0.6rem;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 1px 6px rgba(0, 0, 0, 0.1);
+  border: 0.8px solid rgba(107, 114, 128, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+/* Properti khusus untuk error-card */
+.error-card {
+  background: rgba(0, 0, 0, 0.4); /* Efek transparan yang berbeda */
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 0.6rem;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 1px 6px rgba(0, 0, 0, 0.1);
+  border: 0.8px solid rgba(107, 114, 128, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+  
+  /* Membuat kartu berada di tengah vertikal */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+
+body.light .swap-card {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+body.light .error-card {
+  background: rgba(255, 255, 255, 0.85); /* Efek transparan yang berbeda untuk light mode */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.swap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.swap-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.swap-title h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+body.light .swap-title h2 {
+  color: #1f2937;
+}
+
+.network-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: #e5e7eb;
+}
+
+body.light .network-indicator {
+  color: #1f2937;
+}
+
+.pulse {
+  width: 5px;
+  height: 5px;
+  background: #3b82f6; /* Biru untuk animasi */
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.settings-btn, .history-btn {
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 6px;
+}
+
+body.light .settings-btn, body.light .history-btn {
+  color: #1f2937;
+}
+
+.settings-btn:hover, .history-btn:hover {
+  color: #6b7280;
+}
+
+.token-input-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.4rem;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+body.light .token-input-container {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.token-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.token-amount-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+body.light .token-amount-wrapper {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.token-amount {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #e5e7eb;
+  font-size: 0.6rem;
+  font-weight: 600;
+  outline: none;
+  padding: 0.4rem 70px 0.4rem 0.4rem;
+}
+
+body.light .token-amount {
+  color: #1f2937;
+}
+
+.token-amount::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+body.light .token-amount::placeholder {
+  color: rgba(28, 37, 38, 0.5);
+}
+
+.token-amount:disabled {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.light .token-amount:disabled {
+  color: rgba(28, 37, 38, 0.7);
+}
+
+/* Menghapus ikon scroll pada input number untuk token keluar */
+.token-input-container:nth-of-type(2) .token-amount::-webkit-inner-spin-button,
+.token-input-container:nth-of-type(2) .token-amount::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.token-input-container:nth-of-type(2) .token-amount {
+  -moz-appearance: textfield; /* Untuk Firefox */
+}
+
+.token-selector {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #e5e7eb;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+  cursor: pointer;
+  max-width: 310px;
+}
+
+body.light .token-selector {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.token-selector:hover {
+  background: #6b7280;
+  border: none;
+}
+
+.token-selector img {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.token-symbol {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50px;
+}
+
+.verified-icon {
+  color: #10b981;
+  font-size: 0.7rem;
+}
+
+.token-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.token-balance {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+body.light .token-balance {
+  color: rgba(28, 37, 38, 0.6);
+}
+
+.percentage-buttons {
+  display: flex;
+  gap: 0.2rem;
+  justify-content: flex-end;
+}
+
+.percentage-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+  border: none;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 32px;
+  text-align: center;
+}
+
+body.light .percentage-btn {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.percentage-btn:hover:not(.selected), .percentage-btn.selected {
+  background: #6b7280;
+}
+
+.swap-arrow {
+  display: flex;
+  justify-content: center;
+}
+
+.swap-arrow-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  padding: 0.3rem;
+  color: #e5e7eb;
+  font-size: 0.3rem;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+  cursor: pointer;
+}
+
+body.light .swap-arrow-btn {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+.swap-arrow-btn:hover {
+  background: #6b7280;
+  border: none;
+}
+
+.pair-price {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0.4rem 0;
+}
+
+body.light .pair-price {
+  color: rgba(28, 37, 38, 0.7);
+}
+
+.swap-button {
+  background: #6b7280;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, color 0.2s;
+  position: relative; /* Untuk positioning ikon loading */
+}
+
+.swap-button:hover:not(:disabled) {
+  background: #4b5563;
+  transform: translateY(-1px);
+  color: #a5b4fc; /* Warna teks berubah saat hover, biru muda */
+}
+
+.swap-button.loading {
+  position: relative;
+  color: transparent; /* Sembunyikan teks saat loading */
+  cursor: not-allowed;
+}
+
+.swap-button.loading::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 46%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3); /* Base border */
+  border-radius: 50%;
+  animation: multi-color-spin 1.5s linear infinite; /* Animasi multi-warna */
+}
+
+.enter-amount-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: not-allowed;
+  position: relative; /* Untuk konsistensi */
+}
+
+body.light .enter-amount-button {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+}
+
+body.light .swap-button {
+  color: #ffffff;
+}
+
+body.light .swap-button:hover:not(:disabled) {
+  color: #60a5fa; /* Warna teks saat hover di light mode */
+}
+
+body.light .swap-button.loading::before {
+  border: 3px solid rgba(28, 37, 38, 0.3);
+  animation: multi-color-spin 1.5s linear infinite;
+}
+
+.error-card h2 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #ef4444;
+}
+
+.error-card p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.light .error-card p {
+  color: rgba(28, 37, 38, 0.7);
+}
+
+@media (max-width: 768px) {
+  .swap-form {
+    min-height: calc(100vh - 98px);
+    margin-top: 54px;
+  }
+  .swap-card, .error-card {
+    max-width: 320px;
+    padding: 0.7rem;
+  }
+  .swap-title h2 { font-size: 1.1rem; }
+  .network-indicator { font-size: 0.65rem; }
+  .settings-btn, .history-btn { font-size: 0.75rem; }
+  .token-input-container { padding: 0.35rem; }
+  .token-amount { font-size: 0.85rem; padding: 0.35rem 65px 0.35rem 0.35rem; }
+  .token-selector { max-width: 55px; font-size: 0.65rem; padding: 0.15rem 0.35rem; }
+  .token-selector img { width: 11px; height: 11px; }
+  .token-symbol { max-width: 35px; }
+  .verified-icon { font-size: 0.55rem; }
+  .token-balance, .percentage-btn, .pair-price { font-size: 0.6rem; }
+  .percentage-btn { min-width: 30px; padding: 0.15rem 0.35rem; }
+  .swap-arrow-btn { padding: 0.25rem; }
+  .swap-button, .enter-amount-button { font-size: 0.75rem; padding: 0.45rem; }
+  .swap-button.loading::before {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .swap-form {
+    min-height: calc(100vh - 94px);
+    margin-top: 52px;
+  }
+  .swap-card, .error-card {
+    max-width: 280px;
+    padding: 0.6rem;
+  }
+  .swap-title h2 { font-size: 1rem; }
+  .token-amount { font-size: 0.8rem; padding: 0.3rem 60px 0.3rem 0.3rem; }
+  .token-selector { max-width: 50px; font-size: 0.6rem; }
+  .token-symbol { max-width: 30px; }
+}
+
+@media (max-width: 360px) {
+  .swap-form {
+    min-height: calc(100vh - 90px);
+    margin-top: 50px;
+  }
+  .swap-card, .error-card {
+    max-width: 260px;
+    padding: 0.5rem;
+  }
+  .swap-title h2 { font-size: 0.95rem; }
+  .token-amount { font-size: 0.75rem; padding: 0.25rem 55px 0.25rem 0.25rem; }
+  .token-selector { max-width: 45px; font-size: 0.55rem; padding: 0.1rem 0.3rem; }
+  .token-symbol { max-width: 25px; }
+}
