@@ -7,17 +7,17 @@ import '../style/Claimlist.css';
 
 // Import token logos
 import usdtLogo from '../assets/evm-tokens/usdt-logo.png';
-import aineLogo from '../assets/evm-tokens/ainime-logo.gif'; // Assuming aine-logo.png is the same as ainime-logo.gif
+import aineLogo from '../assets/evm-tokens/ainime-logo.gif';
 import ogaineLogo from '../assets/evm-tokens/ogaine-logo.png';
-import btcLogo from '../assets/evm-tokens/btc-logo.png'; // Placeholder, replace if actual logo is provided
+import btcLogo from '../assets/evm-tokens/btc-logo.png';
 import ethLogo from '../assets/evm-tokens/eth-logo.png';
 import suiLogo from '../assets/evm-tokens/sui-logo.png';
-import ogLogo from '../assets/evm-tokens/og-logo.png'; // Added OG Native logo
+import ogLogo from '../assets/evm-tokens/og-logo.png';
 
 // Import Faucet ABI
 import AINIMEDexFaucetABI from '../abi_json/AINIMEDex_Faucet.json';
 
-function ClaimListModal({ walletData }) {
+function Faucet({ walletData }) {
   const navigate = useNavigate();
   const [isClaiming, setIsClaiming] = useState({});
 
@@ -26,10 +26,10 @@ function ClaimListModal({ walletData }) {
     {
       symbol: 'OG',
       name: 'OG Native',
-      address: null, // No contract address for external link
+      address: null,
       logo: ogLogo,
       disabled: false,
-      externalLink: 'https://faucet.0g.ai/', // External faucet link
+      externalLink: 'https://faucet.0g.ai/',
     },
     {
       symbol: 'USDTaine',
@@ -56,7 +56,7 @@ function ClaimListModal({ walletData }) {
       symbol: 'BTCaine',
       name: 'Bitcoin AINE',
       address: '0xA5e937cbEC05EB8F71Ae8388845976A16046667b',
-      logo: btcLogo, // Replace with actual logo if provided
+      logo: btcLogo,
       disabled: false,
     },
     {
@@ -161,4 +161,4 @@ function ClaimListModal({ walletData }) {
   );
 }
 
-export default ClaimListModal;
+export default Faucet;
