@@ -37,6 +37,7 @@ function SwapForm({ setShowFaucetModal, walletData }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const flippyAudio = useRef(null);
+  const routerAddress = '0x677d3823c98E47776eB46BFc0A4C6dF5758BBeC5';
 
   useEffect(() => {
     flippyAudio.current = new Audio(flippySound);
@@ -68,7 +69,7 @@ function SwapForm({ setShowFaucetModal, walletData }) {
     { address: '0xAACDf6B66B1b451B43FDA6270548783F642833C5', symbol: 'USDTainime', name: 'USDT AINIME', logo: usdtLogo, verified: true },
     { address: '0x1a0326c89c000C18794dD012D5055d9D16900f77', symbol: 'AINIME', name: 'AINIME', logo: aineLogo, verified: true },
     { address: '0xd2476F4d3D5479982Df08382A4063018A9b7483c', symbol: 'OGainime', name: 'OG AINIME', logo: ogaineLogo, verified: true },
-    { address: '0xA5e937cbEC05EB8F71Ae8388645976A16046667b', symbol: 'BTCainime', name: 'BITCOIN AINIME', logo: btcLogo, verified: true },
+    { address: '0xA5e937cbEC05EB8F71Ae8388845976A16046667b', symbol: 'BTCainime', name: 'BITCOIN AINIME', logo: btcLogo, verified: true },
     { address: '0x832b82d71296577E7b5272ef2884F2E5EAE66065', symbol: 'ETHainime', name: 'ETHEREUM AINIME', logo: ethLogo, verified: true },
   ];
 
@@ -136,27 +137,39 @@ function SwapForm({ setShowFaucetModal, walletData }) {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const routerContract = new ethers.Contract(
-        '0x677d3823c98E47776eB46BFc0A4C6dF5758BBeC5',
+        routerAddress,
         AINIMEDexRouterABI,
         provider
       );
-      const amountInWei = ethers.utils.parseUnits(amountIn, 18);
-
-      // Mengambil output yang diharapkan
-      const amounts = await routerContract.getAmountsOut(amountInWei, [tokenInAddress, tokenOutAddress]);
-      const amountOutWei = amounts[1];
       
-      const amountOutFormatted = parseFloat(ethers.utils.formatUnits(amountOutWei, 18)).toFixed(4);
+      const amountInWei = ethers.utils.parseUnits(amountIn || '0', 18);
+      const [price, reserveA, reserveB] = await routerContract.getTokenPrice(tokenInAddress, tokenOutAddress, true);
+
+      if (reserveA.eq(0) || reserveB.eq(0)) {
+        setAmountOut('0');
+        setPairPrice('');
+        toast.error('No liquidity for this pair.', { position: 'bottom-left' });
+        return;
+      }
+      
+      // Menggunakan formula dari kontrak pintar untuk perhitungan yang akurat
+      const amountInWithFee = amountInWei.mul(997);
+      const numerator = amountInWithFee.mul(reserveB);
+      const denominator = reserveA.mul(1000).add(amountInWithFee);
+      const amountOutWei = numerator.div(denominator);
+
+      // Mengaplikasikan slippage di frontend untuk visualisasi yang akurat
+      const slippageFactor = 1 - parseFloat(slippage) / 100;
+      const amountOutAfterSlippage = amountOutWei.mul(ethers.utils.parseUnits(slippageFactor.toString(), 18)).div(ethers.utils.parseUnits('1', 18));
+      
+      const amountOutFormatted = parseFloat(ethers.utils.formatUnits(amountOutAfterSlippage, 18)).toFixed(4);
       setAmountOut(amountOutFormatted);
 
-      // Mendapatkan harga untuk ditampilkan
-      const [price, reserveA, reserveB] = await routerContract.getTokenPrice(tokenInAddress, tokenOutAddress, false);
-      
+      // Menghitung harga per unit untuk tampilan
       const priceFormatted = parseFloat(ethers.utils.formatUnits(price, 18)).toFixed(4);
       const tokenInSymbol = tokens.find(t => t.address === tokenInAddress)?.symbol || 'Token';
       const tokenOutSymbol = tokens.find(t => t.address === tokenOutAddress)?.symbol || 'Token';
       setPairPrice(`1 ${tokenInSymbol} ≈ ${priceFormatted} ${tokenOutSymbol}`);
-
     } catch (error) {
       setAmountOut('0');
       setPairPrice('');
@@ -234,35 +247,32 @@ function SwapForm({ setShowFaucetModal, walletData }) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const gasPriceWei = ethers.utils.parseUnits(gasPrice, 'gwei');
-
-      const amountInWei = ethers.utils.parseUnits(amountIn, 18);
-      const amountOutMinWei = ethers.utils.parseUnits(amountOut, 18).mul(Math.floor((1 - parseFloat(slippage) / 100) * 100)).div(100);
-
       const tokenContract = new ethers.Contract(
         tokenInAddress,
         ['function approve(address spender, uint256 amount) external returns (bool)'],
         signer
       );
-
       const routerContract = new ethers.Contract(
-        '0x677d3823c98E47776eB46BFc0A4C6dF5758BBeC5',
+        routerAddress,
         AINIMEDexRouterABI,
         signer
       );
       
-      const approveTx = await tokenContract.approve('0x677d3823c98E47776eB46BFc0A4C6dF5758BBeC5', amountInWei, { gasPrice: gasPriceWei });
+      const amountInWei = ethers.utils.parseUnits(amountIn, 18);
+      const amountOutMinWei = ethers.utils.parseUnits(amountOut, 18).mul(Math.floor((1 - parseFloat(slippage) / 100) * 100)).div(100);
+
+      // Tahap 1: Lakukan approval terlebih dahulu
+      const approveTx = await tokenContract.approve(routerAddress, amountInWei, { gasPrice: gasPriceWei });
       await approveTx.wait();
+      toast.info('Approval successful. Initiating swap...', { position: 'bottom-left' });
 
-      const txOptions = { gasPrice: gasPriceWei };
-      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 menit dari sekarang
-
+      // Tahap 2: Lakukan swap
       const swapTx = await routerContract.swapExactTokensForTokens(
         amountInWei,
         amountOutMinWei,
         [tokenInAddress, tokenOutAddress],
         walletData.address,
-        deadline,
-        txOptions
+        { gasPrice: gasPriceWei }
       );
       await swapTx.wait();
 
